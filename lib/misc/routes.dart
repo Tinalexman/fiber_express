@@ -1,7 +1,7 @@
 import 'package:fiber_express/pages/auth/forgot.dart';
 import 'package:fiber_express/pages/auth/login.dart';
 import 'package:fiber_express/pages/home/billing/billing.dart';
-import 'package:fiber_express/pages/home/dashboard.dart';
+import 'package:fiber_express/pages/home/dashboard/dashboard.dart';
 import 'package:fiber_express/pages/home/profile/profile.dart';
 import 'package:fiber_express/pages/home/profile/reset_password.dart';
 import 'package:fiber_express/pages/home/report/report.dart';

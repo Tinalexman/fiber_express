@@ -175,40 +175,35 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
                       return null;
                     },
                   ),
+                  SizedBox(height: 100.h),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(390.w, 50.h),
+                      fixedSize: Size(390.w, 50.h),
+                      backgroundColor: primary,
+                      elevation: 1.0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(7.5.r),
+                      ),
+                    ),
+                    onPressed: () {
+                      if (loading || !validateForm(formKey)) return;
+                      setState(() => loading = true);
+                    },
+                    child: loading
+                        ? whiteLoader
+                        : Text(
+                      "Change",
+                      style: context.textTheme.bodyLarge!.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
-        ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: 20.w,
-          vertical: 10.h,
-        ),
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            minimumSize: Size(390.w, 50.h),
-            fixedSize: Size(390.w, 50.h),
-            backgroundColor: primary,
-            elevation: 1.0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(7.5.r),
-            ),
-          ),
-          onPressed: () {
-            if (loading || !validateForm(formKey)) return;
-            setState(() => loading = true);
-          },
-          child: loading
-              ? whiteLoader
-              : Text(
-                  "Change",
-                  style: context.textTheme.bodyLarge!.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
         ),
       ),
     );
