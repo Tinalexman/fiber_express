@@ -1,7 +1,6 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:fiber_express/components/plan.dart';
 import 'package:fiber_express/components/user.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 const User dummyUser = User(
   firstName: "John",
@@ -15,9 +14,15 @@ const User dummyUser = User(
 );
 
 final StateProvider<User> userProvider = StateProvider((ref) => dummyUser);
-
-
+final StateProvider<Plan> currentPlanProvider = StateProvider(
+  (ref) => const Plan(
+    name: "Royal Plan",
+    mbLimit: 100,
+    amount: 59500,
+  ),
+);
 
 void logout(WidgetRef ref) {
+  ref.invalidate(currentPlanProvider);
   ref.invalidate(userProvider);
 }

@@ -1,9 +1,12 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
-import 'constants.dart';
-import 'functions.dart';
+import 'package:fiber_express/components/plan.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
+
+import 'constants.dart';
+import 'functions.dart';
 
 const SpinKitDancingSquare loader = SpinKitDancingSquare(
   color: primary,
@@ -28,7 +31,7 @@ class TabHeaderDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) =>
+          BuildContext context, double shrinkOffset, bool overlapsContent) =>
       Container(
         color: context.isDark ? Colors.black : Colors.white,
         child: tabBar,
@@ -45,10 +48,10 @@ class Popup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const AlertDialog(
-    backgroundColor: Colors.transparent,
-    elevation: 0,
-    content: CenteredPopup(),
-  );
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        content: CenteredPopup(),
+      );
 }
 
 class CenteredPopup extends StatelessWidget {
@@ -124,7 +127,7 @@ class SpecialForm extends StatelessWidget {
       height: allowHeightExpand ? null : height,
       child: TextFormField(
         autovalidateMode:
-        autoValidate ? AutovalidateMode.always : AutovalidateMode.disabled,
+            autoValidate ? AutovalidateMode.always : AutovalidateMode.disabled,
         maxLines: maxLines,
         focusNode: focus,
         autofocus: autoFocus,
@@ -156,19 +159,19 @@ class SpecialForm extends StatelessWidget {
               ),
           prefixIcon: prefix != null
               ? SizedBox(
-            width: height,
-            height: height,
-            child: Center(
-              child: prefix,
-            ),
-          )
+                  width: height,
+                  height: height,
+                  child: Center(
+                    child: prefix,
+                  ),
+                )
               : null,
           suffixIcon: suffix != null
               ? SizedBox(
-            width: height,
-            height: height,
-            child: Center(child: suffix),
-          )
+                  width: height,
+                  height: height,
+                  child: Center(child: suffix),
+                )
               : null,
           focusedBorder: OutlineInputBorder(
             borderRadius: radius ?? BorderRadius.circular(7.5.r),
@@ -286,19 +289,19 @@ class ComboBox extends StatelessWidget {
         items: dropdownItems
             .map(
               (String item) => DropdownMenuItem<String>(
-            value: item,
-            child: Container(
-              alignment: valueAlignment,
-              child: Text(
-                item,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                style: context.textTheme.bodyLarge!
-                    .copyWith(fontWeight: FontWeight.w500),
+                value: item,
+                child: Container(
+                  alignment: valueAlignment,
+                  child: Text(
+                    item,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: context.textTheme.bodyLarge!
+                        .copyWith(fontWeight: FontWeight.w500),
+                  ),
+                ),
               ),
-            ),
-          ),
-        )
+            )
             .toList(),
         onChanged: onChanged,
         selectedItemBuilder: selectedItemBuilder,
@@ -311,11 +314,11 @@ class ComboBox extends StatelessWidget {
           decoration: (noDecoration)
               ? null
               : buttonDecoration ??
-              BoxDecoration(
-                borderRadius: BorderRadius.circular(
-                  buttonHeight == null ? 20 : 7.5.r,
-                ),
-              ),
+                  BoxDecoration(
+                    borderRadius: BorderRadius.circular(
+                      buttonHeight == null ? 20 : 7.5.r,
+                    ),
+                  ),
           elevation: buttonElevation,
         ),
         iconStyleData: IconStyleData(
@@ -379,5 +382,207 @@ Widget heroShuttleBuilder(
       );
     case HeroFlightDirection.pop:
       return fromContext.widget;
+  }
+}
+
+class PlanContainer extends StatelessWidget {
+  final Plan plan;
+
+  const PlanContainer({super.key, required this.plan});
+
+  @override
+  Widget build(BuildContext context) {
+    bool darkTheme = context.isDark;
+
+    return Container(
+      width: 375.w,
+      height: 130.h,
+      decoration: BoxDecoration(
+        color: darkTheme ? secondary : primary,
+        borderRadius: BorderRadius.circular(15.r),
+      ),
+      padding: EdgeInsets.symmetric(
+        horizontal: 20.w,
+        vertical: 10.h,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Active Package",
+            style: context.textTheme.bodyMedium!.copyWith(
+              color: light,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          SizedBox(height: 2.h),
+          Text(
+            plan.name,
+            style: context.textTheme.titleLarge!.copyWith(
+              color: light,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          SizedBox(height: 5.h),
+          Text(
+            "₦${formatAmount(plan.amount.toStringAsFixed(0))}",
+            style: context.textTheme.headlineLarge!.copyWith(
+              color: light,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          SizedBox(height: 5.h),
+          Text(
+            "Capped at ${plan.mbLimit}Mbps (VAT incl.)",
+            style: context.textTheme.bodyMedium!.copyWith(
+              color: light,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ChoosePlanContainer extends StatefulWidget {
+  final Function onSelect;
+
+  const ChoosePlanContainer({
+    super.key,
+    required this.onSelect,
+  });
+
+  @override
+  State<ChoosePlanContainer> createState() => _ChoosePlanContainerState();
+}
+
+class _ChoosePlanContainerState extends State<ChoosePlanContainer> {
+  Plan plan = const Plan();
+
+  final List<Plan> allPlans = const [
+    Plan(
+      name: "Royal Plan",
+      mbLimit: 100,
+      amount: 59500,
+    ),
+    Plan(
+      name: "Gold Plan",
+      mbLimit: 40,
+      amount: 28500,
+    ),
+  ];
+
+  void showPlans() {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) {
+        bool darkTheme = context.isDark;
+
+        return ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: 50.h,
+            maxHeight: 180.h,
+            minWidth: 375.w,
+            maxWidth: 375.w,
+          ),
+          child: ListView.builder(
+            itemBuilder: (_, index) => ListTile(
+              onTap: () {
+                Navigator.of(ctx).pop();
+                setState(() => plan = allPlans[index]);
+                widget.onSelect(allPlans[index]);
+              },
+              contentPadding: EdgeInsets.symmetric(horizontal: 20.w),
+              leading: Icon(
+                IconsaxPlusLinear.gift,
+                size: 26.r,
+                color: darkTheme ? secondary : primary,
+              ),
+              title: Text(
+                "${allPlans[index].name} (${"₦${formatAmount(allPlans[index].amount.toStringAsFixed(0))}"})",
+                style: context.textTheme.titleMedium!.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              subtitle: Text(
+                "Capped at ${allPlans[index].mbLimit}Mbps",
+                style: context.textTheme.bodyMedium,
+              ),
+            ),
+            itemCount: allPlans.length,
+            physics: const BouncingScrollPhysics(),
+          ),
+        );
+      },
+      showDragHandle: true,
+      elevation: 1.0,
+      useSafeArea: true,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    bool darkTheme = context.isDark;
+
+    return GestureDetector(
+      onTap: showPlans,
+      child: Container(
+        width: 375.w,
+        height: 130.h,
+        decoration: BoxDecoration(
+          color: plan.isEmpty
+              ? (darkTheme ? neutral : light)
+              : (darkTheme ? secondary : primary),
+          borderRadius: BorderRadius.circular(15.r),
+        ),
+        padding: EdgeInsets.symmetric(
+          horizontal: 20.w,
+          vertical: 10.h,
+        ),
+        alignment: plan.isEmpty ? Alignment.center : null,
+        child: plan.isEmpty
+            ? Text(
+                "Tap to select a new plan",
+                style: context.textTheme.bodyLarge,
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "New Package",
+                    style: context.textTheme.bodyMedium!.copyWith(
+                      color: light,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  SizedBox(height: 2.h),
+                  Text(
+                    plan.name,
+                    style: context.textTheme.titleLarge!.copyWith(
+                      color: light,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(height: 5.h),
+                  Text(
+                    "₦${formatAmount(plan.amount.toStringAsFixed(0))}",
+                    style: context.textTheme.headlineLarge!.copyWith(
+                      color: light,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  SizedBox(height: 5.h),
+                  Text(
+                    "Capped at ${plan.mbLimit}Mbps (VAT incl.)",
+                    style: context.textTheme.bodyMedium!.copyWith(
+                      color: light,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+      ),
+    );
   }
 }

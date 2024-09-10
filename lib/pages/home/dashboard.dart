@@ -20,6 +20,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     String id = ref.watch(userProvider.select((value) => value.id));
+    bool darkTheme = context.isDark;
+
 
     return Scaffold(
       key: scaffoldKey,
@@ -34,9 +36,28 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 60.h),
-              Image.asset(
-                "assets/images/fiber.png",
-                fit: BoxFit.cover,
+              Padding(
+                padding: EdgeInsets.only(left: 20.w),
+                child: RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: "fiber",
+                        style: context.textTheme.headlineMedium!.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: darkTheme ? light : primary,
+                        )
+                      ),
+                      TextSpan(
+                          text: "Xpress",
+                          style: context.textTheme.headlineMedium!.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: darkTheme ? light : secondary,
+                          )
+                      )
+                    ]
+                  ),
+                ),
               ),
               SizedBox(height: 50.h),
               ListTile(
@@ -48,7 +69,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                 leading: Icon(
                   IconsaxPlusLinear.menu_1,
                   size: 26.r,
-                  color: primary,
+                  color: darkTheme ? light : monokai,
                 ),
                 title: Text(
                   "Dashboard",
@@ -66,7 +87,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                 leading: Icon(
                   IconsaxPlusLinear.chart_1,
                   size: 26.r,
-                  color: primary,
+                  color: darkTheme ? light : monokai,
                 ),
                 title: Text(
                   "Billing",
@@ -84,7 +105,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                 leading: Icon(
                   IconsaxPlusLinear.graph,
                   size: 26.r,
-                  color: primary,
+                  color: darkTheme ? light : monokai,
                 ),
                 title: Text(
                   "Report",
@@ -102,7 +123,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                 leading: Icon(
                   IconsaxPlusLinear.profile,
                   size: 26.r,
-                  color: primary,
+                  color: darkTheme ? light : monokai,
                 ),
                 title: Text(
                   "Profile",
@@ -122,7 +143,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                 leading: Icon(
                   IconsaxPlusLinear.logout,
                   size: 26.r,
-                  color: primary,
+                  color: darkTheme ? light : monokai,
                 ),
                 title: Text(
                   "Logout",
@@ -155,17 +176,17 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
             child: CachedNetworkImage(
               imageUrl: roboImage(id),
               errorWidget: (_, __, c) => CircleAvatar(
-                radius: 22.r,
+                radius: 20.r,
                 backgroundColor: Colors.transparent,
               ),
               progressIndicatorBuilder: (_, __, c) => CircleAvatar(
-                radius: 22.r,
+                radius: 20.r,
                 backgroundColor: secondary.withOpacity(0.5),
               ),
               imageBuilder: (_, provider) => GestureDetector(
                 onTap: () => context.router.pushNamed(Pages.profile),
                 child: CircleAvatar(
-                  radius: 22.r,
+                  radius: 20.r,
                   backgroundImage: provider,
                 ),
               ),
