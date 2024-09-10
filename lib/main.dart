@@ -57,13 +57,29 @@ class _FiberExpressState extends State<FiberExpress> {
           fontFamily: "Montserrat",
           useMaterial3: true,
           appBarStyle: FlexAppBarStyle.scaffoldBackground,
-        ).toTheme,
+        ).toTheme.copyWith(
+          cardTheme: const CardTheme(
+            elevation: 0.0,
+            color: null,
+            shape: LinearBorder(),
+            shadowColor: Colors.black12,
+            surfaceTintColor: Colors.transparent,
+          ),
+        ),
         darkTheme: FlexColorScheme.dark(
           scheme: FlexScheme.aquaBlue,
           fontFamily: "Montserrat",
           useMaterial3: true,
           appBarStyle: FlexAppBarStyle.scaffoldBackground,
-        ).toTheme,
+        ).toTheme.copyWith(
+          cardTheme: const CardTheme(
+            elevation: 0.0,
+            color: null,
+            shape: LinearBorder(),
+            shadowColor: Colors.white10,
+            surfaceTintColor: Colors.transparent,
+          ),
+        ),
         routerConfig: router,
       ),
       splitScreenMode: true,

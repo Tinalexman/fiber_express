@@ -47,8 +47,6 @@ class _ReportPageState extends ConsumerState<ReportPage> {
 
   @override
   Widget build(BuildContext context) {
-    bool darkTheme = context.isDark;
-
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
@@ -104,7 +102,12 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                 ),
               ),
               SizedBox(height: 10.h),
-              Expanded(child: IndexedStack(), )
+              Expanded(
+                child: IndexedStack(
+                  index: menus.indexOf(currentMenu),
+                  children: children,
+                ),
+              ),
             ],
           ),
         ),

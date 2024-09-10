@@ -42,11 +42,16 @@ void showToast(String message, BuildContext context, {Color? backgroundColor}) {
 
 void unFocus() => FocusManager.instance.primaryFocus?.unfocus();
 
-String formatRawAmount(int price) => formatAmount(price.toString());
+String formatRawAmount(double price) {
+  bool negative = price < 0;
+  price = abs(price).toDouble();
+  return "${negative ? "-" : ""}${formatAmount(price.toStringAsFixed(0))}";
+}
 
 String formatAmount(String price) {
   String priceInText = "";
   int counter = 0;
+
   for (int i = (price.length - 1); i >= 0; i--) {
     counter++;
     String str = price[i];
@@ -216,6 +221,8 @@ List<String> toStringList(List<dynamic> data) {
 
 String roboImage(String id) =>
     "https://gravatar.com/avatar/${fastHash(id).toString()}?s=400&d=robohash&r=x";
+
+num abs(num a) => a < 0 ? -a : a;
 
 
 class DateUtilities {
