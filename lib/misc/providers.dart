@@ -10,7 +10,8 @@ const User dummyUser = User(
   email: "johndoe@mail.com",
   address: "Somewhere in the world",
   phone: "2349012345678",
-  state: "None"
+  state: "None",
+  image: "",
 );
 
 final StateProvider<User> userProvider = StateProvider((ref) => dummyUser);

@@ -5,9 +5,9 @@ import 'package:go_router/go_router.dart';
 const Color primary = Color(0xFF4707EA);
 const Color secondary = Color(0xFFFF881C);
 const Color tertiary = Color(0xFFFF410B);
-const Color monokai = Color(0xFF313131);
+const Color monokai = Color(0xFF262626);
 const Color neutral = Color(0xFF636363);
-
+const Color light = Color(0xFFE8E8E8);
 
 class Pages {
   static String get onboarding => "onboard";
@@ -19,6 +19,7 @@ class Pages {
   static String get billing => "billing";
   static String get report => "report";
   static String get profile => "profile";
+  static String get resetPassword => "reset-password";
 }
 
 extension StringPath on String {

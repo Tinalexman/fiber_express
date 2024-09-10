@@ -12,7 +12,7 @@ const SpinKitDancingSquare loader = SpinKitDancingSquare(
 
 const SpinKitDancingSquare whiteLoader = SpinKitDancingSquare(
   color: Colors.white,
-  size: 20,
+  size: 32,
 );
 
 class TabHeaderDelegate extends SliverPersistentHeaderDelegate {
@@ -81,7 +81,7 @@ class SpecialForm extends StatelessWidget {
   final TextStyle? style;
   final TextStyle? hintStyle;
   final bool readOnly;
-  final int? maxLines;
+  final int maxLines;
   final bool allowHeightExpand;
   final double width;
   final double height;
@@ -113,7 +113,7 @@ class SpecialForm extends StatelessWidget {
     this.hint,
     this.prefix,
     this.suffix,
-    this.maxLines,
+    this.maxLines = 1,
   });
 
   @override
@@ -147,7 +147,7 @@ class SpecialForm extends StatelessWidget {
         decoration: InputDecoration(
           errorMaxLines: 1,
           errorStyle: const TextStyle(height: 0, fontSize: 0),
-          fillColor: fillColor ?? (darkTheme ? monokai : Colors.white),
+          fillColor: fillColor ?? (darkTheme ? monokai : light),
           filled: true,
           contentPadding: padding ??
               EdgeInsets.symmetric(

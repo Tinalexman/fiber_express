@@ -214,6 +214,9 @@ List<String> toStringList(List<dynamic> data) {
   return result;
 }
 
+String roboImage(String id) =>
+    "https://gravatar.com/avatar/${fastHash(id).toString()}?s=400&d=robohash&r=x";
+
 
 class DateUtilities {
   static DateTime getDaysAgo(int day) {

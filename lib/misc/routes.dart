@@ -6,6 +6,7 @@ import 'package:fiber_express/pages/home/billing.dart';
 import 'package:fiber_express/pages/home/dashboard.dart';
 import 'package:fiber_express/pages/home/profile.dart';
 import 'package:fiber_express/pages/home/report.dart';
+import 'package:fiber_express/pages/home/reset_password.dart';
 import 'package:fiber_express/pages/intro/onboarding.dart';
 import 'package:go_router/go_router.dart';
 import 'constants.dart';
@@ -57,5 +58,9 @@ final List<GoRoute> routes = [
     name: Pages.report,
     builder: (_, __) => const ReportPage(),
   ),
-
+  GoRoute(
+    path: Pages.resetPassword.path,
+    name: Pages.resetPassword,
+    builder: (_, __) => const ResetPasswordPage(),
+  ),
 ];

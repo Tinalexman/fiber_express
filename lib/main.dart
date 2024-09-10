@@ -40,7 +40,7 @@ class _FiberExpressState extends State<FiberExpress> {
   void initState() {
     super.initState();
     router = GoRouter(
-      initialLocation: widget.firstRun ? Pages.onboarding.path : Pages.login,
+      initialLocation: Pages.dashboard.path, //widget.firstRun ? Pages.onboarding.path : Pages.login.path,
       routes: routes,
     );
   }
@@ -56,11 +56,13 @@ class _FiberExpressState extends State<FiberExpress> {
           scheme: FlexScheme.aquaBlue,
           fontFamily: "Montserrat",
           useMaterial3: true,
+          appBarStyle: FlexAppBarStyle.scaffoldBackground,
         ).toTheme,
-        darkTheme: FlexColorScheme.light(
+        darkTheme: FlexColorScheme.dark(
           scheme: FlexScheme.aquaBlue,
           fontFamily: "Montserrat",
           useMaterial3: true,
+          appBarStyle: FlexAppBarStyle.scaffoldBackground,
         ).toTheme,
         routerConfig: router,
       ),
