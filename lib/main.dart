@@ -1,0 +1,74 @@
+import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:is_first_run/is_first_run.dart';
+
+import 'misc/constants.dart';
+import 'misc/routes.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
+  await ScreenUtil.ensureScreenSize();
+
+  bool firstRun = await IsFirstRun.isFirstRun();
+
+  runApp(ProviderScope(child: FiberExpress(firstRun: firstRun)));
+}
+
+class FiberExpress extends StatefulWidget {
+  final bool firstRun;
+
+  const FiberExpress({
+    super.key,
+    required this.firstRun,
+  });
+
+  @override
+  State<FiberExpress> createState() => _FiberExpressState();
+}
+
+class _FiberExpressState extends State<FiberExpress> {
+  late GoRouter router;
+
+  @override
+  void initState() {
+    super.initState();
+    router = GoRouter(
+      initialLocation: widget.firstRun ? Pages.onboarding.path : Pages.login,
+      routes: routes,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ScreenUtilInit(
+      builder: (_, child) => MaterialApp.router(
+        title: 'Fiber Express',
+        debugShowCheckedModeBanner: false,
+        themeMode: ThemeMode.system,
+        theme: FlexColorScheme.light(
+          scheme: FlexScheme.aquaBlue,
+          fontFamily: "Montserrat",
+          useMaterial3: true,
+        ).toTheme,
+        darkTheme: FlexColorScheme.light(
+          scheme: FlexScheme.aquaBlue,
+          fontFamily: "Montserrat",
+          useMaterial3: true,
+        ).toTheme,
+        routerConfig: router,
+      ),
+      splitScreenMode: true,
+      ensureScreenSize: true,
+      useInheritedMediaQuery: true,
+      designSize: const Size(375, 800),
+      minTextAdapt: true,
+    );
+  }
+}

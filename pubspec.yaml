@@ -1,0 +1,86 @@
+name: fiber_express
+description: "A new Flutter project."
+
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.4 <4.0.0'
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+
+
+  dio:
+  file_picker:
+  flutter_riverpod:
+  flutter_screenutil:
+  go_router:
+  cached_network_image:
+  flutter_spinkit:
+  flex_color_scheme:
+  equatable:
+  flutter_boxicons:
+  flutter_launcher_icons:
+  flutter_native_splash:
+  timeago:
+  shared_preferences:
+  animated_switcher_plus:
+  animated_snack_bar:
+  intl:
+  iconsax_plus:
+  fl_chart:
+  faker:
+  dropdown_button2:
+  is_first_run: 
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+
+  flutter_lints: ^3.0.0
+
+
+flutter_launcher_icons:
+  image_path_android: "assets/images/L11.png"
+  image_path_ios: "assets/images/L11.png"
+  android: true
+  ios: true
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/L11.png"
+  min_sdk_android: 29
+  remove_alpha_ios: true
+
+flutter_native_splash:
+  android: true
+  ios: true
+  web: false
+  color: "#FFFFFF"
+  image: "assets/images/L11.png"
+  branding: "assets/images/B11.png"
+
+  android_12:
+    color: "#FFFFFF"
+    image: "assets/images/L12.png"
+    branding: "assets/images/B12.png"
+
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+  fonts:
+    - family: Montserrat
+      fonts:
+        - asset: assets/fonts/Montserrat-Black.ttf
+        - asset: assets/fonts/Montserrat-Bold.ttf
+        - asset: assets/fonts/Montserrat-ExtraBold.ttf
+        - asset: assets/fonts/Montserrat-Light.ttf
+        - asset: assets/fonts/Montserrat-Medium.ttf
+        - asset: assets/fonts/Montserrat-Regular.ttf
+        - asset: assets/fonts/Montserrat-SemiBold.ttf
+        - asset: assets/fonts/Montserrat-Thin.ttf
