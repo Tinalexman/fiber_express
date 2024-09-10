@@ -10,9 +10,9 @@ const User dummyUser = User(
   lastName: "Doe",
   id: "Dummy ID",
   email: "johndoe@mail.com",
-  address: "Somewhere in the world",
+  address: "12 Marina Street, Necom House",
   phone: "2349012345678",
-  state: "None",
+  state: "Lagos",
   image: "",
 );
 

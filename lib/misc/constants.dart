@@ -10,10 +10,7 @@ const Color neutral = Color(0xFF636363);
 const Color light = Color(0xFFE8E8E8);
 
 class Pages {
-  static String get onboarding => "onboard";
   static String get login => "login";
-  static String get register => "register";
-  static String get completeProfile => "complete-profile";
   static String get forgot => "forgot";
   static String get dashboard => "dashboard";
   static String get billing => "billing";

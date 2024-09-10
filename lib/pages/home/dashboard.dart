@@ -46,16 +46,16 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                         style: context.textTheme.headlineMedium!.copyWith(
                           fontWeight: FontWeight.bold,
                           color: darkTheme ? light : primary,
-                        )
+                        ),
                       ),
                       TextSpan(
-                          text: "Xpress",
-                          style: context.textTheme.headlineMedium!.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: darkTheme ? light : secondary,
-                          )
+                        text: "Xpress",
+                        style: context.textTheme.headlineMedium!.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: darkTheme ? light : secondary,
+                        ),
                       )
-                    ]
+                    ],
                   ),
                 ),
               ),

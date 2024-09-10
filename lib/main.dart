@@ -40,7 +40,7 @@ class _FiberExpressState extends State<FiberExpress> {
   void initState() {
     super.initState();
     router = GoRouter(
-      initialLocation: Pages.dashboard.path, //widget.firstRun ? Pages.onboarding.path : Pages.login.path,
+      initialLocation: Pages.login.path,
       routes: routes,
     );
   }
