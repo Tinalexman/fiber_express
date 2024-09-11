@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:fiber_express/components/plan.dart';
 import 'package:fiber_express/components/transaction.dart';
+import 'package:fiber_express/components/usage.dart';
 import 'package:fiber_express/components/user.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -17,11 +18,24 @@ const User dummyUser = User(
 );
 
 final StateProvider<User> userProvider = StateProvider((ref) => dummyUser);
+
 final StateProvider<Plan> currentPlanProvider = StateProvider(
   (ref) => const Plan(
     name: "Royal Plan",
     mbLimit: 100,
     amount: 59500,
+  ),
+);
+
+final StateProvider<List<Usage>> dataUsageProvider = StateProvider(
+  (ref) => List.generate(
+    10,
+    (index) => Usage(
+      id: "Usage ID $index",
+      month: "Septemer",
+      year: "2024",
+      total: "240GB",
+    ),
   ),
 );
 
@@ -86,19 +100,19 @@ final StateProvider<List<PaymentTransaction>> paymentTransactionsProvider =
       double amount = min(-100000, random.nextInt(100000)).toDouble();
 
       return PaymentTransaction(
-        createdAt: now,
-        id: "Payment Transaction $index",
-        amount: amount,
-        payment: "paystack-0301dc1a5726438cjddwnw0inw082ekj",
-        reference: "subs-d43af94c1a774772992jkjddwnw0inw082ekj00hnkj",
-        method: "Paystack",
-        status: random.nextBool() ? "Completed" : "Awaiting Callback"
-      );
+          createdAt: now,
+          id: "Payment Transaction $index",
+          amount: amount,
+          payment: "paystack-0301dc1a5726438cjddwnw0inw082ekj",
+          reference: "subs-d43af94c1a774772992jkjddwnw0inw082ekj00hnkj",
+          method: "Paystack",
+          status: random.nextBool() ? "Completed" : "Awaiting Callback");
     },
   ),
 );
 
 void logout(WidgetRef ref) {
+  ref.invalidate(dataUsageProvider);
   ref.invalidate(subscriptionTransactionsProvider);
   ref.invalidate(paymentTransactionsProvider);
   ref.invalidate(walletTransactionsProvider);
