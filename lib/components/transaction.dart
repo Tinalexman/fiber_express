@@ -30,16 +30,16 @@ class SubscriptionTransaction extends Equatable {
   final double amount;
   final String method;
   final String status;
-  final DateTime formerExpiry;
-  final DateTime newExpiry;
-  final DateTime createdAt;
+  final String formerExpiry;
+  final String newExpiry;
+  final String createdAt;
   final String reference;
   final String plan;
 
   const SubscriptionTransaction({
-    required this.formerExpiry,
-    required this.newExpiry,
-    required this.createdAt,
+    this.formerExpiry = "",
+    this.newExpiry = "",
+    this.createdAt = "",
     this.id = "",
     this.amount = 0.0,
     this.method = "",
@@ -57,12 +57,12 @@ class PaymentTransaction extends Equatable {
   final double amount;
   final String method;
   final String status;
-  final DateTime createdAt;
+  final String createdAt;
   final String reference;
   final String payment;
 
   const PaymentTransaction({
-    required this.createdAt,
+    this.createdAt = "",
     this.id = "",
     this.amount = 0.0,
     this.method = "",

@@ -48,9 +48,7 @@ void showToast(String message, BuildContext context, {Color? backgroundColor}) {
 void unFocus() => FocusManager.instance.primaryFocus?.unfocus();
 
 String formatRawAmount(double price) {
-  bool negative = price < 0;
-  price = abs(price).toDouble();
-  return "${negative ? "-" : ""}${formatAmount(price.toStringAsFixed(0))}";
+  return formatAmount(abs(price).toStringAsFixed(0));
 }
 
 String formatAmount(String price) {

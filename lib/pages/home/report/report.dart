@@ -1,4 +1,5 @@
 import 'package:fiber_express/misc/constants.dart';
+import 'package:fiber_express/misc/providers.dart';
 import 'package:fiber_express/misc/widgets.dart';
 import 'package:fiber_express/pages/home/report/payment.dart';
 import 'package:fiber_express/pages/home/report/subscription.dart';
@@ -56,13 +57,21 @@ class _ReportPageState extends ConsumerState<ReportPage> {
           iconSize: 26.r,
         ),
         title: Text(
-          "$currentMenu Report",
+          currentMenu,
           style: context.textTheme.titleLarge!.copyWith(
             fontWeight: FontWeight.w600,
           ),
         ),
         centerTitle: true,
         actions: [
+          IconButton(
+            onPressed: () {
+              bool prevState = ref.watch(refreshReportsProvider);
+              ref.watch(refreshReportsProvider.notifier).state = !prevState;
+            },
+            icon: const Icon(IconsaxPlusLinear.refresh),
+            iconSize: 24.r,
+          ),
           PopupMenuButton<String>(
             onSelected: (String value) => setState(() => currentMenu = value),
             elevation: 1.0,
@@ -88,27 +97,33 @@ class _ReportPageState extends ConsumerState<ReportPage> {
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
-          child: Column(
-            children: [
-              SpecialForm(
-                controller: controller,
-                width: 375.w,
-                height: 50.h,
-                hint: "Search ${currentMenu.toLowerCase()}",
-                action: TextInputAction.search,
-                prefix: Icon(
-                  IconsaxPlusLinear.search_normal,
-                  size: 20.r,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                SpecialForm(
+                  controller: controller,
+                  width: 375.w,
+                  height: 50.h,
+                  hint: "Search ${currentMenu.toLowerCase()} transactions",
+                  onChange: (val) => ref
+                      .watch(reportsSearchProvider.notifier)
+                      .state = val ?? "",
+                  action: TextInputAction.search,
+                  prefix: Icon(
+                    IconsaxPlusLinear.search_normal,
+                    size: 20.r,
+                  ),
                 ),
-              ),
-              SizedBox(height: 10.h),
-              Expanded(
-                child: IndexedStack(
-                  index: menus.indexOf(currentMenu),
-                  children: children,
+                SizedBox(height: 10.h),
+                SizedBox(
+                  height: 600.h,
+                  child: IndexedStack(
+                    index: menus.indexOf(currentMenu),
+                    children: children,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

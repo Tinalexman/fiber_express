@@ -1,3 +1,4 @@
+import 'package:fiber_express/api/reports.dart';
 import 'package:fiber_express/components/transaction.dart';
 import 'package:fiber_express/misc/constants.dart';
 import 'package:fiber_express/misc/functions.dart';
@@ -30,6 +31,42 @@ class _PaymentState extends ConsumerState<Payment> {
           ),
         ),
       );
+      getData();
+    });
+  }
+
+  void displayToast(String message) => showToast(message, context);
+
+  Future<void> getData({int newPage = 1}) async {
+    String username = ref.watch(userProvider.select((value) => value.username));
+    String search = ref.watch(reportsSearchProvider);
+    FiberResponse<List<PaymentTransaction>> response =
+        await getPaymentTransactions(username, search, newPage);
+    if (!response.success) {
+      displayToast(response.message);
+      return;
+    }
+
+    List<PaymentTransaction> transactions = response.data;
+    ref.watch(paymentTransactionsProvider.notifier).state = transactions;
+
+    setState(
+      () => dataSource = PaymentSource(
+        transactions: transactions,
+        textStyle: context.textTheme.bodyMedium?.copyWith(
+          color: null,
+        ),
+      ),
+    );
+  }
+
+  void listenForSearchChanges() {
+    ref.listen(reportsSearchProvider, (_, __) {
+      getData();
+    });
+
+    ref.listen(refreshReportsProvider, (_, __) {
+      getData();
     });
   }
 
@@ -106,7 +143,6 @@ class PaymentSource extends DataTableSource {
   @override
   DataRow? getRow(int index) {
     PaymentTransaction transaction = transactions[index];
-
     return DataRow(
       cells: [
         DataCell(
@@ -123,7 +159,7 @@ class PaymentSource extends DataTableSource {
         ),
         DataCell(
           Text(
-            "₦${formatRawAmount(transaction.amount)}",
+            "${transaction.amount < 0 ? "-" : ""}₦${formatRawAmount(transaction.amount)}",
             style: textStyle?.copyWith(
               fontWeight: FontWeight.w600,
             ),
@@ -137,7 +173,7 @@ class PaymentSource extends DataTableSource {
         ),
         DataCell(
           Text(
-            formatDateRawWithTime(transaction.createdAt),
+            formatDateRawWithTime(DateTime.parse(transaction.createdAt)),
             style: textStyle?.copyWith(
               fontWeight: FontWeight.w500,
             ),

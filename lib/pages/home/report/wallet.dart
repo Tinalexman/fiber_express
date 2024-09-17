@@ -37,14 +37,17 @@ class _WalletState extends ConsumerState<Wallet> {
 
   void displayToast(String message) => showToast(message, context);
 
-  Future<void> getData() async {
+  Future<void> getData({int newPage = 1}) async {
     String username = ref.watch(userProvider.select((value) => value.username));
+    String search = ref.watch(reportsSearchProvider);
     FiberResponse<List<WalletTransaction>> response =
-        await getWalletTransactions(username, "", 1);
+        await getWalletTransactions(username, search, newPage);
     if (!response.success) {
       displayToast(response.message);
       return;
     }
+
+    //setTotalRows(getPR.headers["x-pagination-totalcount"]);
 
     List<WalletTransaction> transactions = response.data;
     ref.watch(walletTransactionsProvider.notifier).state = transactions;
@@ -59,9 +62,23 @@ class _WalletState extends ConsumerState<Wallet> {
     );
   }
 
+  void listenForSearchChanges() {
+    ref.listen(reportsSearchProvider, (_, __) {
+      getData();
+    });
+
+    ref.listen(refreshReportsProvider, (_, __) {
+      getData();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    listenForSearchChanges();
+
     return PaginatedDataTable(
+      rowsPerPage: 10,
+      onPageChanged: (newPage) => getData(newPage: newPage),
       columns: [
         DataColumn(
           label: Text(
@@ -81,7 +98,7 @@ class _WalletState extends ConsumerState<Wallet> {
         ),
         DataColumn(
           label: Text(
-            'Balance After',
+            'Balance Before',
             style: context.textTheme.bodyLarge!.copyWith(
               fontWeight: FontWeight.w600,
             ),
@@ -145,7 +162,7 @@ class WalletSource extends DataTableSource {
       cells: [
         DataCell(
           Text(
-            "₦${formatRawAmount(transaction.amount)}",
+            "${transaction.amount < 0 ? "-" : ""}₦${formatRawAmount(transaction.amount)}",
             style: textStyle?.copyWith(
               color: transaction.amount < 0 ? Colors.red : Colors.green,
               fontWeight: FontWeight.w600,

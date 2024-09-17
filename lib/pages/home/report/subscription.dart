@@ -1,3 +1,4 @@
+import 'package:fiber_express/api/reports.dart';
 import 'package:fiber_express/components/transaction.dart';
 import 'package:fiber_express/misc/constants.dart';
 import 'package:fiber_express/misc/functions.dart';
@@ -30,6 +31,42 @@ class _SubscriptionState extends ConsumerState<Subscription> {
           ),
         ),
       );
+      getData();
+    });
+  }
+
+  void displayToast(String message) => showToast(message, context);
+
+  Future<void> getData({int newPage = 1}) async {
+    String username = ref.watch(userProvider.select((value) => value.username));
+    String search = ref.watch(reportsSearchProvider);
+    FiberResponse<List<SubscriptionTransaction>> response =
+        await getSubscriptionTransactions(username, search, newPage);
+    if (!response.success) {
+      displayToast(response.message);
+      return;
+    }
+
+    List<SubscriptionTransaction> transactions = response.data;
+    ref.watch(subscriptionTransactionsProvider.notifier).state = transactions;
+
+    setState(
+      () => dataSource = SubscriptionSource(
+        transactions: transactions,
+        textStyle: context.textTheme.bodyMedium?.copyWith(
+          color: null,
+        ),
+      ),
+    );
+  }
+
+  void listenForSearchChanges() {
+    ref.listen(reportsSearchProvider, (_, __) {
+      getData();
+    });
+
+    ref.listen(refreshReportsProvider, (_, __) {
+      getData();
     });
   }
 
@@ -133,7 +170,7 @@ class SubscriptionSource extends DataTableSource {
         ),
         DataCell(
           Text(
-            "₦${formatRawAmount(transaction.amount)}",
+            "${transaction.amount < 0 ? "-" : ""}₦${formatRawAmount(transaction.amount)}",
             style: textStyle?.copyWith(
               fontWeight: FontWeight.w600,
             ),
@@ -141,13 +178,13 @@ class SubscriptionSource extends DataTableSource {
         ),
         DataCell(
           Text(
-            formatDateRawWithTime(transaction.formerExpiry),
+            formatDateRawWithTime(DateTime.parse(transaction.formerExpiry)),
             style: textStyle,
           ),
         ),
         DataCell(
           Text(
-            formatDateRawWithTime(transaction.newExpiry),
+            formatDateRawWithTime(DateTime.parse(transaction.newExpiry)),
             style: textStyle,
           ),
         ),
@@ -165,7 +202,7 @@ class SubscriptionSource extends DataTableSource {
         ),
         DataCell(
           Text(
-            formatDateRawWithTime(transaction.createdAt),
+            formatDateRawWithTime(DateTime.parse(transaction.createdAt)),
             style: textStyle?.copyWith(
               fontWeight: FontWeight.w500,
             ),
