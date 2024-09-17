@@ -5,7 +5,6 @@ import 'package:fiber_express/misc/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:iconsax_plus/iconsax_plus.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
@@ -25,6 +24,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     String phone = ref.watch(userProvider.select((value) => value.phone));
     String address = ref.watch(userProvider.select((value) => value.address));
     String state = ref.watch(userProvider.select((value) => value.state));
+    DateTime joined =
+        ref.watch(userProvider.select((value) => value.createdAt));
 
     return Scaffold(
       appBar: AppBar(
@@ -89,76 +90,40 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   ),
                 ),
                 SizedBox(height: 40.h),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(
-                      IconsaxPlusLinear.profile,
-                      size: 16.r,
-                    ),
-                    SizedBox(width: 5.w),
-                    Text(
-                      "$firstName $lastName",
-                      style: context.textTheme.bodyLarge!.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+                Text(
+                  "$firstName $lastName",
+                  style: context.textTheme.headlineMedium!.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-                SizedBox(height: 6.h),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.mail_outline_rounded,
-                      size: 14.r,
-                    ),
-                    SizedBox(width: 5.w),
-                    Text(
-                      email,
-                      style: context.textTheme.bodyMedium!.copyWith(
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
+                SizedBox(height: 10.h),
+                Text(
+                  email,
+                  style: context.textTheme.bodyLarge!.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: context.isDark ? secondary : primary,
+                  ),
                 ),
-                SizedBox(height: 3.h),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(
-                      IconsaxPlusLinear.location,
-                      size: 16.r,
-                    ),
-                    SizedBox(width: 5.w),
-                    Text(
-                      "$address, $state",
-                      style: context.textTheme.bodyMedium!.copyWith(
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
+                SizedBox(height: 5.h),
+                Text(
+                  "$address, $state",
+                  style: context.textTheme.bodyMedium!.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-                SizedBox(height: 3.h),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(
-                      IconsaxPlusLinear.call,
-                      size: 16.r,
-                    ),
-                    SizedBox(width: 5.w),
-                    Text(
-                      phone,
-                      style: context.textTheme.bodyMedium!.copyWith(
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
+                SizedBox(height: 5.h),
+                Text(
+                  phone,
+                  style: context.textTheme.bodyMedium!.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                SizedBox(height: 5.h),
+                Text(
+                  "Joined on ${formatDateRaw(joined)}",
+                  style: context.textTheme.bodyMedium!.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),

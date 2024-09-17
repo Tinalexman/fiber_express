@@ -9,11 +9,6 @@ import 'constants.dart';
 import 'functions.dart';
 
 const SpinKitDancingSquare loader = SpinKitDancingSquare(
-  color: primary,
-  size: 20,
-);
-
-const SpinKitDancingSquare whiteLoader = SpinKitDancingSquare(
   color: Colors.white,
   size: 32,
 );
@@ -141,7 +136,7 @@ class SpecialForm extends StatelessWidget {
             onActionPressed!(controller.text);
           }
         },
-        cursorColor: primary,
+        cursorColor: !darkTheme ? primary : secondary,
         style: style ??
             context.textTheme.bodyLarge!.copyWith(
               fontWeight: FontWeight.w500,

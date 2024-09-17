@@ -21,6 +21,12 @@ class DashboardPage extends ConsumerStatefulWidget {
 class _DashboardPageState extends ConsumerState<DashboardPage> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
 
+
+
+
+
+
+
   @override
   Widget build(BuildContext context) {
     String id = ref.watch(userProvider.select((value) => value.id));
@@ -72,53 +78,59 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
           ],
         ),
         body: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 10.h),
-                      const Details(),
-                      SizedBox(height: 50.h),
-                      Text(
-                        "Monthly Data Usage Report",
-                        style: context.textTheme.bodyLarge!.copyWith(
-                          fontWeight: FontWeight.w600,
+          child: RefreshIndicator(
+            onRefresh: () async {
+              bool prevState = ref.watch(refreshHomeDashboardProvider);
+              ref.watch(refreshHomeDashboardProvider.notifier).state = !prevState;
+            },
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 10.h),
+                        const Details(),
+                        SizedBox(height: 50.h),
+                        Text(
+                          "Monthly Data Usage Report",
+                          style: context.textTheme.bodyLarge!.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 5.h),
+                        SizedBox(height: 5.h),
+                      ],
+                    ),
+                  ),
+                  TabBar(
+                    labelColor: darkTheme ? secondary : primary,
+                    labelStyle: context.textTheme.bodyLarge!.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+                    indicatorColor: darkTheme ? secondary : primary,
+                    unselectedLabelColor: darkTheme ? light : neutral,
+                    unselectedLabelStyle: context.textTheme.bodyLarge,
+                    tabs: const [
+                      Tab(text: "Graph"),
+                      Tab(text: "Table"),
                     ],
                   ),
-                ),
-                TabBar(
-                  labelColor: darkTheme ? secondary : primary,
-                  labelStyle: context.textTheme.bodyLarge!.copyWith(
-                    fontWeight: FontWeight.w500,
+                  SizedBox(height: 10.h),
+                  SizedBox(
+                    height: 600.h,
+                    child: const TabBarView(
+                      children: [
+                        DataGraph(),
+                        DataUsage(),
+                      ],
+                    ),
                   ),
-                  indicatorColor: darkTheme ? secondary : primary,
-                  unselectedLabelColor: darkTheme ? light : neutral,
-                  unselectedLabelStyle: context.textTheme.bodyLarge,
-                  tabs: const [
-                    Tab(text: "Graph"),
-                    Tab(text: "Table"),
-                  ],
-                ),
-                SizedBox(height: 10.h),
-                SizedBox(
-                  height: 600.h,
-                  child: const TabBarView(
-                    children: [
-                      DataGraph(),
-                      DataUsage(),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 10.h),
-              ],
+                  SizedBox(height: 10.h),
+                ],
+              ),
             ),
           ),
         ),

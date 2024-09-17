@@ -1,23 +1,36 @@
 import 'dart:math';
 
+import 'package:fiber_express/api/file_service.dart';
 import 'package:fiber_express/components/plan.dart';
+import 'package:fiber_express/components/subscription_and_device.dart';
 import 'package:fiber_express/components/transaction.dart';
 import 'package:fiber_express/components/usage.dart';
 import 'package:fiber_express/components/user.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-const User dummyUser = User(
-  firstName: "John",
-  lastName: "Doe",
-  id: "Dummy ID",
-  email: "johndoe@mail.com",
-  address: "12 Marina Street, Necom House",
-  phone: "2349012345678",
-  state: "Lagos",
-  image: "",
-);
+User dummyUser = User(
+    firstName: "John",
+    lastName: "Doe",
+    id: "Dummy ID",
+    email: "johndoe@mail.com",
+    address: "12 Marina Street, Necom House",
+    phone: "2349012345678",
+    state: "Lagos",
+    createdAt: DateTime.now(),
+    userGroup: "User Group");
 
 final StateProvider<User> userProvider = StateProvider((ref) => dummyUser);
+final StateProvider<SubscriptionPlan> subscriptionPlanProvider = StateProvider(
+  (ref) => SubscriptionPlan(
+    expiration: DateTime.now(),
+  ),
+);
+
+final StateProvider<DeviceStatus> deviceStatusProvider = StateProvider(
+      (ref) => DeviceStatus(
+    lastOnline: DateTime.now(),
+  ),
+);
 
 final StateProvider<Plan> currentPlanProvider = StateProvider(
   (ref) => const Plan(
@@ -111,11 +124,18 @@ final StateProvider<List<PaymentTransaction>> paymentTransactionsProvider =
   ),
 );
 
+
+final StateProvider<bool> refreshHomeDashboardProvider = StateProvider((ref) => false);
+
 void logout(WidgetRef ref) {
+  ref.invalidate(refreshHomeDashboardProvider);
+  ref.invalidate(deviceStatusProvider);
+  ref.invalidate(subscriptionPlanProvider);
   ref.invalidate(dataUsageProvider);
   ref.invalidate(subscriptionTransactionsProvider);
   ref.invalidate(paymentTransactionsProvider);
   ref.invalidate(walletTransactionsProvider);
   ref.invalidate(currentPlanProvider);
   ref.invalidate(userProvider);
+  FileManager.saveAuthDetails(null);
 }

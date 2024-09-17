@@ -1,3 +1,4 @@
+import 'package:fiber_express/api/dashboard.dart';
 import 'package:fiber_express/components/plan.dart';
 import 'package:fiber_express/misc/constants.dart';
 import 'package:fiber_express/misc/functions.dart';
@@ -7,11 +8,46 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 
-class Details extends ConsumerWidget {
+class Details extends ConsumerStatefulWidget {
   const Details({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<Details> createState() => _DetailsState();
+}
+
+class _DetailsState extends ConsumerState<Details> {
+
+  bool loading = false;
+
+
+  @override
+  void initState() {
+    super.initState();
+
+    Future.delayed(Duration.zero, getData);
+  }
+
+
+  Future<void> getData() async {
+    String planID = ref.watch(subscriptionPlanProvider.select((value) => value.currentPlan));
+    await getServicePlan(planID);
+  }
+
+
+  void shouldRefresh() {
+    ref.listen(refreshHomeDashboardProvider, (previous, next) {
+      if((!previous! && next) || (previous && !next)) {
+        getData();
+      }
+    });
+  }
+
+
+
+  @override
+  Widget build(BuildContext context) {
+    shouldRefresh();
+
     bool darkTheme = context.isDark;
     Plan plan = ref.watch(currentPlanProvider);
     double balance = 66500, dataUsed = 49.05, upload = 5.58, download = 43.46;

@@ -109,7 +109,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage>
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           minimumSize: Size(390.w, 50.h),
-                          backgroundColor: primary,
+                          backgroundColor: darkTheme ? secondary : primary,
                           elevation: 1.0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(7.5.r),

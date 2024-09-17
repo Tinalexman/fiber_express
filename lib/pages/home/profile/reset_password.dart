@@ -191,7 +191,7 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
                       setState(() => loading = true);
                     },
                     child: loading
-                        ? whiteLoader
+                        ? loader
                         : Text(
                       "Change",
                       style: context.textTheme.bodyLarge!.copyWith(

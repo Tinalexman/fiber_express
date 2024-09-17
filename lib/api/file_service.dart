@@ -14,7 +14,7 @@ class FileManager {
   static Future<void> saveAuthDetails(Map<String, String>? auth) async {
     SharedPreferences instance = await SharedPreferences.getInstance();
     await instance.setString(
-        _fiberMail, auth == null ? "" : auth["emailAddress"]!);
+        _fiberMail, auth == null ? "" : auth["username"]!);
     await instance.setString(
         _fiberPassword, auth == null ? "" : auth["password"]!);
   }
@@ -30,7 +30,7 @@ class FileManager {
         password.isEmpty) {
       return null;
     }
-    return {"emailAddress": email, "password": password};
+    return {"username": email, "password": password};
   }
 
   static Future<void> save(String key, String value) async {

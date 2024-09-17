@@ -14,7 +14,7 @@ final List<GoRoute> routes = [
   GoRoute(
     path: Pages.login.path,
     name: Pages.login,
-    builder: (_, __) => const LoginPage(),
+    builder: (_, state) => LoginPage(details: state.extra as Map<String, String>?),
   ),
   GoRoute(
     path: Pages.forgot.path,
