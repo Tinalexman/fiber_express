@@ -1,6 +1,9 @@
 import 'package:animated_switcher_plus/animated_switcher_plus.dart';
+import 'package:fiber_express/api/authentication.dart';
+import 'package:fiber_express/api/file_service.dart';
 import 'package:fiber_express/misc/constants.dart';
 import 'package:fiber_express/misc/functions.dart';
+import 'package:fiber_express/misc/providers.dart';
 import 'package:fiber_express/misc/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,10 +30,40 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
 
   bool loading = false;
 
-  final Map<String, String> resetDetails = {
-    "currentPassword": "",
-    "newPassword": "",
-  };
+  late Map<String, String> resetDetails;
+
+  @override
+  void initState() {
+    super.initState();
+
+    resetDetails = {
+      "oldPassword": "",
+      "newPassword": "",
+      "userName": ref.read(userProvider).username,
+    };
+  }
+
+  void displayToast(String message) => showToast(message, context);
+
+  void change() async {
+    FiberResponse response = await changePassword(resetDetails);
+
+    if (!response.success) {
+      displayToast(response.message);
+    } else {
+      displayToast("Password Updated");
+      FileManager.saveAuthDetails({
+        "username": resetDetails["userName"]!,
+        "password": resetDetails["newPassword"]!,
+      });
+
+       currentPasswordController.clear();
+       confirmPasswordController.clear();
+       newPasswordController.clear();
+    }
+
+    setState(() => loading = false);
+  }
 
   @override
   void dispose() {
@@ -102,7 +135,7 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
                       }
                       return null;
                     },
-                    onSave: (value) => resetDetails["currentPassword"] = value!,
+                    onSave: (value) => resetDetails["oldPassword"] = value!,
                   ),
                   SizedBox(height: 10.h),
                   Text(
@@ -180,7 +213,7 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(390.w, 50.h),
                       fixedSize: Size(390.w, 50.h),
-                      backgroundColor: primary,
+                      backgroundColor: darkTheme ? secondary : primary,
                       elevation: 1.0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(7.5.r),
@@ -189,16 +222,18 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
                     onPressed: () {
                       if (loading || !validateForm(formKey)) return;
                       setState(() => loading = true);
+
+                      change();
                     },
                     child: loading
                         ? loader
                         : Text(
-                      "Change",
-                      style: context.textTheme.bodyLarge!.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+                            "Change",
+                            style: context.textTheme.bodyLarge!.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                   ),
                 ],
               ),

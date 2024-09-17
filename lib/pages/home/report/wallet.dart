@@ -1,3 +1,4 @@
+import 'package:fiber_express/api/reports.dart';
 import 'package:fiber_express/components/transaction.dart';
 import 'package:fiber_express/misc/constants.dart';
 import 'package:fiber_express/misc/functions.dart';
@@ -30,7 +31,32 @@ class _WalletState extends ConsumerState<Wallet> {
           ),
         ),
       );
+      getData();
     });
+  }
+
+  void displayToast(String message) => showToast(message, context);
+
+  Future<void> getData() async {
+    String username = ref.watch(userProvider.select((value) => value.username));
+    FiberResponse<List<WalletTransaction>> response =
+        await getWalletTransactions(username, "", 1);
+    if (!response.success) {
+      displayToast(response.message);
+      return;
+    }
+
+    List<WalletTransaction> transactions = response.data;
+    ref.watch(walletTransactionsProvider.notifier).state = transactions;
+
+    setState(
+      () => dataSource = WalletSource(
+        transactions: transactions,
+        textStyle: context.textTheme.bodyMedium?.copyWith(
+          color: null,
+        ),
+      ),
+    );
   }
 
   @override
@@ -140,7 +166,7 @@ class WalletSource extends DataTableSource {
         ),
         DataCell(
           Text(
-            formatDateRawWithTime(transaction.createdAt),
+            formatDateRawWithTime(DateTime.parse(transaction.createdAt)),
             style: textStyle?.copyWith(
               fontWeight: FontWeight.w500,
             ),

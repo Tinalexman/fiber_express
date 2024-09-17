@@ -5,13 +5,13 @@ class WalletTransaction extends Equatable {
   final double amount;
   final double balanceAfter;
   final double balanceBefore;
-  final DateTime createdAt;
+  final String createdAt;
   final String narration;
   final String purpose;
   final String reference;
 
   const WalletTransaction({
-    required this.createdAt,
+    this.createdAt = "",
     this.id = "",
     this.amount = 0.0,
     this.balanceAfter = 0.0,
@@ -24,7 +24,6 @@ class WalletTransaction extends Equatable {
   @override
   List<Object?> get props => [id];
 }
-
 
 class SubscriptionTransaction extends Equatable {
   final String id;

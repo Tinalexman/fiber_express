@@ -82,3 +82,34 @@ Future<FiberResponse<LoginResponse?>> authenticate(
   );
 }
 
+
+Future<FiberResponse> changePassword(
+    Map<String, String> details) async {
+  try {
+    Response response = await dio.put(
+      "/client/users/changePassword",
+      data: details,
+      options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token"
+          }
+      ),
+    );
+    if (response.statusCode! == 200) {
+      return const FiberResponse(
+        message: "Success",
+        data: null,
+        success: true,
+      );
+    }
+  } catch (e) {
+    log("Change Password: $e");
+  }
+
+  return const FiberResponse(
+    message: "An error occurred. Please try again",
+    data: null,
+    success: false,
+  );
+}

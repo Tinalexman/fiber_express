@@ -7,40 +7,42 @@ import 'package:intl/intl.dart';
 
 void showToast(String message, BuildContext context, {Color? backgroundColor}) {
   HapticFeedback.vibrate();
-  AnimatedSnackBar snackBar = AnimatedSnackBar(
-    builder: (context) {
-      bool darkTheme = context.isDark;
-      return ConstrainedBox(
-        constraints: BoxConstraints(
-          minWidth: 10.w,
-          maxWidth: 220.w,
-          minHeight: 40.h,
-        ),
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
-          decoration: BoxDecoration(
-            color: backgroundColor ?? (darkTheme ? secondary : primary),
-            borderRadius: BorderRadius.circular(5.r),
+  if(context.mounted) {
+    AnimatedSnackBar snackBar = AnimatedSnackBar(
+      builder: (context) {
+        bool darkTheme = context.isDark;
+        return ConstrainedBox(
+          constraints: BoxConstraints(
+            minWidth: 10.w,
+            maxWidth: 220.w,
+            minHeight: 40.h,
           ),
-          alignment: Alignment.center,
-          child: Text(
-            message,
-            style: context.textTheme.bodySmall!.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+            decoration: BoxDecoration(
+              color: backgroundColor ?? (darkTheme ? secondary : primary),
+              borderRadius: BorderRadius.circular(5.r),
             ),
-            textAlign: TextAlign.center,
+            alignment: Alignment.center,
+            child: Text(
+              message,
+              style: context.textTheme.bodySmall!.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+              ),
+              textAlign: TextAlign.center,
+            ),
           ),
-        ),
-      );
-    },
-    mobileSnackBarPosition: MobileSnackBarPosition.top,
-    animationCurve: Curves.ease,
-    snackBarStrategy: RemoveSnackBarStrategy(),
-    duration: const Duration(seconds: 4),
-    animationDuration: const Duration(milliseconds: 350),
-  );
-  snackBar.show(context);
+        );
+      },
+      mobileSnackBarPosition: MobileSnackBarPosition.top,
+      animationCurve: Curves.ease,
+      snackBarStrategy: RemoveSnackBarStrategy(),
+      duration: const Duration(seconds: 4),
+      animationDuration: const Duration(milliseconds: 350),
+    );
+    snackBar.show(context);
+  }
 }
 
 void unFocus() => FocusManager.instance.primaryFocus?.unfocus();

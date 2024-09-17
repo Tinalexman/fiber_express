@@ -38,30 +38,7 @@ final StateProvider<Wallet> currentWalletProvider =
 final StateProvider<List<Usage>> dataUsageProvider = StateProvider((ref) => []);
 
 final StateProvider<List<WalletTransaction>> walletTransactionsProvider =
-    StateProvider(
-  (ref) => List.generate(
-    15,
-    (index) {
-      DateTime now = DateTime.now();
-      Random random = Random(now.millisecondsSinceEpoch);
-
-      double amount = min(-100000, random.nextInt(100000)).toDouble();
-      double before = min(1000, random.nextInt(50000)).toDouble();
-      double after = before + amount;
-
-      return WalletTransaction(
-        createdAt: now,
-        id: "Wallet Transaction $index",
-        amount: amount,
-        balanceBefore: before,
-        balanceAfter: after,
-        narration: "Royal Plan subscription purpose",
-        purpose: amount < 0 ? "Payment" : "Deposit",
-        reference: "subs-d43af94c1a774772992jkjddwnw0inw082ekj00hnkj",
-      );
-    },
-  ),
-);
+    StateProvider((ref) => []);
 
 final StateProvider<List<SubscriptionTransaction>>
     subscriptionTransactionsProvider = StateProvider(
