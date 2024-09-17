@@ -1,4 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fiber_express/api/dashboard.dart';
+import 'package:fiber_express/components/usage.dart';
 import 'package:fiber_express/misc/constants.dart';
 import 'package:fiber_express/misc/functions.dart';
 import 'package:fiber_express/misc/providers.dart';
@@ -21,14 +23,37 @@ class DashboardPage extends ConsumerStatefulWidget {
 class _DashboardPageState extends ConsumerState<DashboardPage> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
 
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero, getData);
+  }
 
+  void displayToast(String message) => showToast(message, context);
 
+  Future<void> getData() async {
+    String username = ref.watch(userProvider.select((value) => value.username));
+    FiberResponse<List<Usage>> response = await getFullYearDataUsage(username);
+    if (!response.success) {
+      displayToast(response.message);
+      return;
+    }
 
+    ref.watch(dataUsageProvider.notifier).state = response.data;
+  }
 
-
+  void shouldRefresh() {
+    ref.listen(refreshHomeDashboardProvider, (previous, next) {
+      if ((!previous! && next) || (previous && !next)) {
+        getData();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    shouldRefresh();
+
     String id = ref.watch(userProvider.select((value) => value.id));
     bool darkTheme = context.isDark;
 
@@ -81,7 +106,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
           child: RefreshIndicator(
             onRefresh: () async {
               bool prevState = ref.watch(refreshHomeDashboardProvider);
-              ref.watch(refreshHomeDashboardProvider.notifier).state = !prevState;
+              ref.watch(refreshHomeDashboardProvider.notifier).state =
+                  !prevState;
             },
             child: SingleChildScrollView(
               child: Column(

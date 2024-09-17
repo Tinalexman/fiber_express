@@ -6,18 +6,12 @@ import 'package:fiber_express/components/subscription_and_device.dart';
 import 'package:fiber_express/components/transaction.dart';
 import 'package:fiber_express/components/usage.dart';
 import 'package:fiber_express/components/user.dart';
+import 'package:fiber_express/components/wallet.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-User dummyUser = User(
-    firstName: "John",
-    lastName: "Doe",
-    id: "Dummy ID",
-    email: "johndoe@mail.com",
-    address: "12 Marina Street, Necom House",
-    phone: "2349012345678",
-    state: "Lagos",
-    createdAt: DateTime.now(),
-    userGroup: "User Group");
+User dummyUser = const User(
+  id: "Dummy ID",
+);
 
 final StateProvider<User> userProvider = StateProvider((ref) => dummyUser);
 final StateProvider<SubscriptionPlan> subscriptionPlanProvider = StateProvider(
@@ -27,30 +21,21 @@ final StateProvider<SubscriptionPlan> subscriptionPlanProvider = StateProvider(
 );
 
 final StateProvider<DeviceStatus> deviceStatusProvider = StateProvider(
-      (ref) => DeviceStatus(
+  (ref) => DeviceStatus(
     lastOnline: DateTime.now(),
   ),
 );
 
-final StateProvider<Plan> currentPlanProvider = StateProvider(
-  (ref) => const Plan(
-    name: "Royal Plan",
-    mbLimit: 100,
-    amount: 59500,
-  ),
-);
+final StateProvider<Plan> currentPlanProvider =
+    StateProvider((ref) => const Plan());
 
-final StateProvider<List<Usage>> dataUsageProvider = StateProvider(
-  (ref) => List.generate(
-    10,
-    (index) => Usage(
-      id: "Usage ID $index",
-      month: "Septemer",
-      year: "2024",
-      total: "240GB",
-    ),
-  ),
-);
+final StateProvider<Usage> currentDataUsageProvider =
+    StateProvider((ref) => const Usage());
+
+final StateProvider<Wallet> currentWalletProvider =
+    StateProvider((ref) => const Wallet());
+
+final StateProvider<List<Usage>> dataUsageProvider = StateProvider((ref) => []);
 
 final StateProvider<List<WalletTransaction>> walletTransactionsProvider =
     StateProvider(
@@ -124,10 +109,13 @@ final StateProvider<List<PaymentTransaction>> paymentTransactionsProvider =
   ),
 );
 
-
-final StateProvider<bool> refreshHomeDashboardProvider = StateProvider((ref) => false);
+final StateProvider<bool> refreshHomeDashboardProvider =
+    StateProvider((ref) => false);
 
 void logout(WidgetRef ref) {
+  ref.invalidate(currentDataUsageProvider);
+  ref.invalidate(currentPlanProvider);
+  ref.invalidate(currentWalletProvider);
   ref.invalidate(refreshHomeDashboardProvider);
   ref.invalidate(deviceStatusProvider);
   ref.invalidate(subscriptionPlanProvider);

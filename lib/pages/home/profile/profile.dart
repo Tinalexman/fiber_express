@@ -24,7 +24,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     String phone = ref.watch(userProvider.select((value) => value.phone));
     String address = ref.watch(userProvider.select((value) => value.address));
     String state = ref.watch(userProvider.select((value) => value.state));
-    DateTime joined =
+    String joined =
         ref.watch(userProvider.select((value) => value.createdAt));
 
     return Scaffold(
@@ -120,7 +120,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                 ),
                 SizedBox(height: 5.h),
                 Text(
-                  "Joined on ${formatDateRaw(joined)}",
+                  "Joined on ${formatDateRaw(DateTime.parse(joined))}",
                   style: context.textTheme.bodyMedium!.copyWith(
                     fontWeight: FontWeight.w500,
                   ),

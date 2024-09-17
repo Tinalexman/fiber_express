@@ -32,8 +32,27 @@ class _UsageState extends ConsumerState<DataUsage> {
     });
   }
 
+  void getData() {
+    setState(
+      () => dataSource = UsageSource(
+        usages: ref.watch(dataUsageProvider),
+        textStyle: context.textTheme.bodyMedium?.copyWith(
+          color: null,
+        ),
+      ),
+    );
+  }
+
+  void shouldRefresh() {
+    ref.listen(dataUsageProvider, (previous, next) {
+      getData();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    shouldRefresh();
+
     return PaginatedDataTable(
       columns: [
         DataColumn(

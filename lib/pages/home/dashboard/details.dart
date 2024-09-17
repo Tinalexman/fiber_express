@@ -1,5 +1,8 @@
 import 'package:fiber_express/api/dashboard.dart';
 import 'package:fiber_express/components/plan.dart';
+import 'package:fiber_express/components/subscription_and_device.dart';
+import 'package:fiber_express/components/usage.dart';
+import 'package:fiber_express/components/wallet.dart';
 import 'package:fiber_express/misc/constants.dart';
 import 'package:fiber_express/misc/functions.dart';
 import 'package:fiber_express/misc/providers.dart';
@@ -16,9 +19,7 @@ class Details extends ConsumerStatefulWidget {
 }
 
 class _DetailsState extends ConsumerState<Details> {
-
   bool loading = false;
-
 
   @override
   void initState() {
@@ -27,34 +28,67 @@ class _DetailsState extends ConsumerState<Details> {
     Future.delayed(Duration.zero, getData);
   }
 
+  void displayToast(String message) => showToast(message, context);
 
-  Future<void> getData() async {
-    String planID = ref.watch(subscriptionPlanProvider.select((value) => value.currentPlan));
-    await getServicePlan(planID);
+  Future<void> planDetails() async {
+    String planID = ref
+        .watch(subscriptionPlanProvider.select((value) => value.currentPlan));
+    FiberResponse<Plan?> response = await getServicePlan(planID);
+    if (!response.success) {
+      displayToast(response.message);
+      return;
+    }
+
+    ref.watch(currentPlanProvider.notifier).state = response.data!;
   }
 
+  Future<void> dataUsage() async {
+    String username = ref.watch(userProvider.select((value) => value.username));
+    FiberResponse<Usage?> response = await getCurrentMonthDataUsage(username);
+    if (!response.success) {
+      displayToast(response.message);
+      return;
+    }
+
+    ref.watch(currentDataUsageProvider.notifier).state = response.data!;
+  }
+
+  Future<void> walletBalance() async {
+    String username = ref.watch(userProvider.select((value) => value.username));
+    FiberResponse<Wallet?> response = await getWalletBalance(username);
+    if (!response.success) {
+      displayToast(response.message);
+      return;
+    }
+
+    ref.watch(currentWalletProvider.notifier).state = response.data!;
+  }
+
+  void getData() {
+    planDetails();
+    dataUsage();
+    walletBalance();
+  }
 
   void shouldRefresh() {
     ref.listen(refreshHomeDashboardProvider, (previous, next) {
-      if((!previous! && next) || (previous && !next)) {
+      if ((!previous! && next) || (previous && !next)) {
         getData();
       }
     });
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     shouldRefresh();
-
     bool darkTheme = context.isDark;
-    Plan plan = ref.watch(currentPlanProvider);
-    double balance = 66500, dataUsed = 49.05, upload = 5.58, download = 43.46;
-    DateTime expiry = DateUtilities.getCurrentMonthEnd();
-    String status = "active";
-    bool enabled = true;
 
+    SubscriptionPlan subscriptionPlan = ref.watch(subscriptionPlanProvider);
+    Plan plan = ref.watch(currentPlanProvider);
+    Usage usage = ref.watch(currentDataUsageProvider);
+    Wallet wallet = ref.watch(currentWalletProvider);
+
+    String status = subscriptionPlan.status;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -90,7 +124,7 @@ class _DetailsState extends ConsumerState<Details> {
                   ),
                   SizedBox(height: 5.h),
                   Text(
-                    "Capped at ${plan.mbLimit}Mbps (VAT incl.)",
+                    "Capped at ${plan.downloadRate}Mbps (VAT incl.)",
                     style: context.textTheme.bodyMedium!.copyWith(
                       color: light,
                       fontWeight: FontWeight.w500,
@@ -134,7 +168,7 @@ class _DetailsState extends ConsumerState<Details> {
                     ),
                   ),
                   Text(
-                    "₦${formatAmount(balance.toStringAsFixed(0))}",
+                    "${wallet.currency} ${formatAmount(wallet.balance.toStringAsFixed(0))}",
                     style: context.textTheme.headlineLarge!.copyWith(
                       color: light,
                       fontWeight: FontWeight.w600,
@@ -172,13 +206,13 @@ class _DetailsState extends ConsumerState<Details> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Data Usage",
+                    "Data Usage for ${usage.month}, ${usage.year}",
                     style: context.textTheme.labelMedium!.copyWith(
                       color: light,
                     ),
                   ),
                   Text(
-                    "${dataUsed.toStringAsFixed(2)}GB",
+                    usage.total,
                     style: context.textTheme.headlineMedium!.copyWith(
                       color: light,
                       fontWeight: FontWeight.w600,
@@ -190,14 +224,14 @@ class _DetailsState extends ConsumerState<Details> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        "Upload: ${upload.toStringAsFixed(2)}GB",
+                        "Upload: ${usage.uploaded}",
                         style: context.textTheme.bodySmall!.copyWith(
                           color: light,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                       Text(
-                        "Download: ${download.toStringAsFixed(2)}GB",
+                        "Download: ${usage.downloaded}",
                         style: context.textTheme.bodySmall!.copyWith(
                           color: light,
                           fontWeight: FontWeight.w500,
@@ -243,7 +277,8 @@ class _DetailsState extends ConsumerState<Details> {
                     ),
                   ),
                   Text(
-                    formatDateRawWithTime(expiry, shorten: true),
+                    formatDateRawWithTime(subscriptionPlan.expiration,
+                        shorten: true),
                     style: context.textTheme.titleLarge!.copyWith(
                       color: light,
                       fontWeight: FontWeight.w600,
@@ -255,14 +290,14 @@ class _DetailsState extends ConsumerState<Details> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        "Status: $status",
+                        "Status: ${status.capitalize}",
                         style: context.textTheme.bodySmall!.copyWith(
                           color: light,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                       Text(
-                        "Account: ${enabled ? "enabled" : "disabled"}",
+                        "Account: ${plan.enabled ? "Enabled" : "Disabled"}",
                         style: context.textTheme.bodySmall!.copyWith(
                           color: light,
                           fontWeight: FontWeight.w500,

@@ -9,6 +9,9 @@ export 'package:dio/dio.dart';
 const String frontEndClientUsername = "Frontend_Client";
 const String frontEndClientPassword = "ejgM1l7S3jRCoqQqsrtdoVYsL8Vy7M";
 
+const String radiusClientUsername = "Radius_Authentication_Service";
+const String radiusClientPassword = "ASt3zktP4ES0jhHLN6oAgYyNt2a9em";
+
 final Dio dio = Dio(BaseOptions(
   baseUrl: "https://staging.broadbased.net/billingPlatform",
   sendTimeout: const Duration(seconds: 30),

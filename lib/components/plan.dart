@@ -1,18 +1,24 @@
 import 'package:equatable/equatable.dart';
 
 class Plan extends Equatable {
+  final String id;
   final double amount;
   final String name;
-  final int mbLimit;
+  final int downloadRate;
+  final int uploadRate;
+  final bool enabled;
 
   const Plan({
+    this.id = "",
+    this.enabled = false,
     this.amount = 0.0,
-    this.mbLimit = 0,
+    this.downloadRate = 0,
+    this.uploadRate = 0,
     this.name = "",
   });
 
-  bool get isEmpty => amount == 0.0 && mbLimit == 0 && name == "";
+  bool get isEmpty => id.isEmpty;
 
   @override
-  List<Object?> get props => [name];
+  List<Object?> get props => [id];
 }

@@ -428,7 +428,7 @@ class PlanContainer extends StatelessWidget {
           ),
           SizedBox(height: 5.h),
           Text(
-            "Capped at ${plan.mbLimit}Mbps (VAT incl.)",
+            "Capped at ${plan.downloadRate}Mbps (VAT incl.)",
             style: context.textTheme.bodyMedium!.copyWith(
               color: light,
               fontWeight: FontWeight.w500,
@@ -458,12 +458,12 @@ class _ChoosePlanContainerState extends State<ChoosePlanContainer> {
   final List<Plan> allPlans = const [
     Plan(
       name: "Royal Plan",
-      mbLimit: 100,
+      downloadRate: 100,
       amount: 59500,
     ),
     Plan(
       name: "Gold Plan",
-      mbLimit: 40,
+      downloadRate: 40,
       amount: 28500,
     ),
   ];
@@ -501,7 +501,7 @@ class _ChoosePlanContainerState extends State<ChoosePlanContainer> {
                 ),
               ),
               subtitle: Text(
-                "Capped at ${allPlans[index].mbLimit}Mbps",
+                "Capped at ${allPlans[index].downloadRate}Mbps",
                 style: context.textTheme.bodyMedium,
               ),
             ),
@@ -569,7 +569,7 @@ class _ChoosePlanContainerState extends State<ChoosePlanContainer> {
                   ),
                   SizedBox(height: 5.h),
                   Text(
-                    "Capped at ${plan.mbLimit}Mbps (VAT incl.)",
+                    "Capped at ${plan.downloadRate}Mbps (VAT incl.)",
                     style: context.textTheme.bodyMedium!.copyWith(
                       color: light,
                       fontWeight: FontWeight.w500,

@@ -37,13 +37,14 @@ Future<FiberResponse<LoginResponse?>> authenticate(
       User user = User(
         id: data["id"],
         userGroup: data["userGroup"],
+        username: data["userName"],
         firstName: data["profileData"]["firstName"],
         lastName: data["profileData"]["lastName"],
         email: data["profileData"]["email"],
         state: data["profileData"]["state"],
         phone: data["profileData"]["phoneNumber"],
         address: data["profileData"]["address"],
-        createdAt: DateTime.parse(data["createdAt"]),
+        createdAt: data["createdAt"],
       );
 
       SubscriptionPlan subscriptionPlan = SubscriptionPlan(
