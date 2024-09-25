@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:fiber_express/components/usage.dart';
 import 'package:fiber_express/misc/constants.dart';
 import 'package:fiber_express/misc/providers.dart';
@@ -16,7 +14,7 @@ class DataGraph extends ConsumerStatefulWidget {
 }
 
 class _DataGraphState extends ConsumerState<DataGraph> {
-  final List<BarChartGroupData> barData = [];
+  final List<FlSpot> lineChartData = [];
 
   @override
   void initState() {
@@ -26,41 +24,32 @@ class _DataGraphState extends ConsumerState<DataGraph> {
 
   double get maxValue {
     double max = 0.0;
-    for (var rod in barData) {
-      if (rod.barRods[0].toY >= max) {
-        max = rod.barRods[0].toY;
+    for (var spot in lineChartData) {
+      if (spot.y >= max) {
+        max = spot.y;
       }
     }
-    return max;
+    return max + 20;
   }
 
   void getData() {
-    bool darkTheme = context.isDark;
     List<Usage> usages = ref.watch(dataUsageProvider);
-    List<BarChartGroupData> newData = List.generate(
+    List<FlSpot> newData = List.generate(
       usages.length,
-          (i) {
+      (i) {
         String total = usages[i].total;
         total = total.substring(0, total.indexOf("GiB"));
 
         double yValue = double.tryParse(total) ?? 0.0;
 
-        return BarChartGroupData(
-          x: (i + 1),
-          barRods: [
-            BarChartRodData(
-              toY: yValue,
-              fromY: 0,
-              width: 12.w,
-              color: darkTheme ? secondary : primary,
-              borderRadius: BorderRadius.circular(5.r),
-            ),
-          ],
+        return FlSpot(
+          i.toDouble(),
+          yValue,
         );
       },
     );
-    barData.clear();
-    barData.addAll(newData);
+    lineChartData.clear();
+    lineChartData.addAll(newData);
     setState(() {});
   }
 
@@ -73,39 +62,109 @@ class _DataGraphState extends ConsumerState<DataGraph> {
   @override
   Widget build(BuildContext context) {
     shouldRefresh();
+    List<Usage> dataUsage = ref.watch(dataUsageProvider);
+    bool darkTheme = context.isDark;
 
-    return BarChart(
-      BarChartData(
-        minY: 0,
-        maxY: maxValue,
-        alignment: BarChartAlignment.spaceEvenly,
-        titlesData: FlTitlesData(
-          topTitles: const AxisTitles(
-            sideTitles: SideTitles(showTitles: false),
-          ),
-          rightTitles: const AxisTitles(
-            sideTitles: SideTitles(showTitles: false),
-          ),
-          leftTitles: const AxisTitles(
-            sideTitles: SideTitles(showTitles: false),
-          ),
-          bottomTitles: AxisTitles(
-            sideTitles: const SideTitles(showTitles: true),
-            axisNameSize: 40,
-            axisNameWidget: Text(
-              "Months",
-              style: context.textTheme.bodyMedium,
+    return Padding(
+      padding: EdgeInsets.only(left: 5.w, right: 5.w),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: SizedBox(
+          width: 600.w,
+          child: lineChartData.isEmpty ? null : LineChart(
+            LineChartData(
+              minY: 0,
+              maxY: maxValue,
+              minX: 0,
+              maxX: 11,
+              clipData: const FlClipData.horizontal(),
+              backgroundColor: Colors.transparent,
+              gridData: const FlGridData(
+                drawHorizontalLine: true,
+                drawVerticalLine: false,
+              ),
+              borderData: FlBorderData(
+                show: false,
+              ),
+              titlesData: FlTitlesData(
+                topTitles: const AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+                rightTitles: const AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: 45.w,
+                    maxIncluded: false,
+                    minIncluded: false,
+                  ),
+                  axisNameWidget: Text(
+                    "Total Data Used (GiB)",
+                    style: context.textTheme.bodyMedium,
+                  ),
+                ),
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    getTitlesWidget: (value, meta) {
+                      int index = value.toInt();
+                      if (index == dataUsage.length) return const SizedBox();
+                      Usage usage = dataUsage[index];
+                      return Text(usage.month.toShortMonth);
+                    },
+                  ),
+                  axisNameSize: 40,
+                  axisNameWidget: Text(
+                    "Months",
+                    style: context.textTheme.bodyMedium,
+                  ),
+                ),
+              ),
+              lineBarsData: [
+                LineChartBarData(
+                  color: primary,
+                  gradient: LinearGradient(
+                    colors: [
+                      !darkTheme ? primary : secondary,
+                      !darkTheme
+                          ? primary.withOpacity(0.6)
+                          : secondary.withOpacity(0.6),
+                    ],
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                  ),
+                  belowBarData: BarAreaData(
+                    color: !darkTheme ? primary : secondary,
+                    show: true,
+                    gradient: LinearGradient(
+                      colors: [
+                        !darkTheme
+                            ? primary.withOpacity(0.6)
+                            : secondary.withOpacity(0.6),
+                        Colors.white
+                      ],
+                      begin: Alignment.topRight,
+                      end: Alignment.bottomLeft,
+                    ),
+                  ),
+                  shadow: Shadow(
+                    color: !darkTheme
+                        ? primary.withOpacity(0.6)
+                        : secondary.withOpacity(0.6),
+                  ),
+                  isCurved: true,
+                  isStrokeCapRound: true,
+                  curveSmoothness: 0.75,
+                  spots: lineChartData,
+                ),
+              ],
             ),
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
           ),
         ),
-        gridData: const FlGridData(
-          drawHorizontalLine: true,
-          drawVerticalLine: false,
-        ),
-        borderData: FlBorderData(
-          show: false,
-        ),
-        barGroups: barData,
       ),
     );
   }

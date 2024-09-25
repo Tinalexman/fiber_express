@@ -1,22 +1,57 @@
+import 'package:fiber_express/api/billing.dart';
 import 'package:fiber_express/misc/constants.dart';
+import 'package:fiber_express/misc/functions.dart';
+import 'package:fiber_express/misc/providers.dart';
 import 'package:fiber_express/misc/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class WalletTab extends StatefulWidget {
+class WalletTab extends ConsumerStatefulWidget {
   const WalletTab({super.key});
 
   @override
-  State<WalletTab> createState() => _WalletTabState();
+  ConsumerState<WalletTab> createState() => _WalletTabState();
 }
 
-class _WalletTabState extends State<WalletTab> {
+class _WalletTabState extends ConsumerState<WalletTab> {
   final TextEditingController priceController = TextEditingController();
 
   @override
   void dispose() {
     priceController.dispose();
     super.dispose();
+  }
+
+  bool loading = false;
+
+  void showMessage(String message) => showToast(message, context);
+
+  void goBackHome() => context.router.pop();
+
+  Future<void> fund() async {
+    String username = ref.watch(userProvider.select((value) => value.username));
+    String amount = priceController.text.trim().replaceAll(",", "");
+
+    var response = await fundWallet({
+      "userName": username,
+      "amount": amount,
+      "paymentMethod": "paystack",
+    });
+    setState(() => loading = false);
+    showMessage(response.message);
+
+
+    if (response.success && response.data != null) {
+      Future.delayed(Duration.zero, () {
+        launchURL(response.data!.authorizationUrl);
+      });
+      return;
+    }
+
+    bool initialState = ref.watch(refreshHomeDashboardProvider);
+    ref.watch(refreshHomeDashboardProvider.notifier).state = !initialState;
+    goBackHome();
   }
 
   @override
@@ -37,8 +72,9 @@ class _WalletTabState extends State<WalletTab> {
             controller: priceController,
             width: 390.w,
             height: 50.h,
-            hint: "e.g 1000",
+            hint: "e.g 1,000",
             type: TextInputType.number,
+            formatters: [DigitGroupFormatter()],
           ),
           SizedBox(height: 450.h),
           ElevatedButton(
@@ -51,14 +87,26 @@ class _WalletTabState extends State<WalletTab> {
                 borderRadius: BorderRadius.circular(7.5.r),
               ),
             ),
-            onPressed: () {},
-            child: Text(
-              "Pay Now",
-              style: context.textTheme.bodyLarge!.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+            onPressed: () {
+              String value = priceController.text.trim();
+              if (value.isEmpty) {
+                showMessage("Invalid amount");
+                return;
+              }
+
+              if (loading) return;
+              setState(() => loading = true);
+              fund();
+            },
+            child: loading
+                ? loader
+                : Text(
+                    "Pay Now",
+                    style: context.textTheme.bodyLarge!.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
           ),
         ],
       ),

@@ -1,3 +1,4 @@
+import 'package:fiber_express/api/billing.dart';
 import 'package:fiber_express/components/plan.dart';
 import 'package:fiber_express/misc/constants.dart';
 import 'package:fiber_express/misc/functions.dart';
@@ -16,9 +17,46 @@ class PlanTab extends ConsumerStatefulWidget {
 }
 
 class _PlanTabState extends ConsumerState<PlanTab> {
+  bool loading = false;
   int mode = -1;
 
   Plan newPlan = const Plan();
+
+  Color get backgroundColor {
+    bool darkTheme = context.isDark;
+    Color color = darkTheme ? secondary : primary;
+    if(mode == -1 || newPlan.isEmpty) {
+      color = color.withOpacity(0.65);
+    }
+    return color;
+  }
+
+  void showMessage(String message) => showToast(message, context);
+  void goBackHome() => context.router.pop();
+
+  Future<void> makePayment() async {
+    String username = ref.watch(userProvider.select((value) => value.username));
+    String subscriptionPlan = ref.watch(subscriptionPlanProvider.select((value) => value.currentPlan));
+
+    var response = await renewPaymentPlan({
+      "userName": username,
+      "servicePlanId": subscriptionPlan,
+      "paymentMethod": mode == 0 ? "wallet" : "paystack",
+    });
+    setState(() => loading = false);
+    showMessage(response.message);
+    if(response.success) {
+      if(response.data != null) {
+        Future.delayed(Duration.zero, () {
+          launchURL(response.data!.authorizationUrl);
+        });
+      } else {
+        bool initialState = ref.watch(refreshHomeDashboardProvider);
+        ref.watch(refreshHomeDashboardProvider.notifier).state = !initialState;
+        goBackHome();
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -115,20 +153,26 @@ class _PlanTabState extends ConsumerState<PlanTab> {
             style: ElevatedButton.styleFrom(
               minimumSize: Size(390.w, 50.h),
               fixedSize: Size(390.w, 50.h),
-              backgroundColor: darkTheme ? secondary : primary,
+              backgroundColor: backgroundColor,
               elevation: 1.0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(7.5.r),
               ),
             ),
-            onPressed: () {},
-            child: Text(
-              "Pay ₦${formatAmount(newPlan.amount.toStringAsFixed(0))}",
-              style: context.textTheme.bodyLarge!.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+            onPressed: () {
+              if (mode == -1 || newPlan.isEmpty || loading) return;
+              setState(() => loading = true);
+              makePayment();
+            },
+            child: loading
+                ? loader
+                : Text(
+                    "Pay ₦${formatAmount(newPlan.amount.toStringAsFixed(0))}",
+                    style: context.textTheme.bodyLarge!.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
           ),
         ],
       ),

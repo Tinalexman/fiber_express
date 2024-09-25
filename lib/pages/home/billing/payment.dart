@@ -1,3 +1,4 @@
+import 'package:fiber_express/api/billing.dart';
 import 'package:fiber_express/components/plan.dart';
 import 'package:fiber_express/misc/constants.dart';
 import 'package:fiber_express/misc/functions.dart';
@@ -15,8 +16,38 @@ class PaymentTab extends ConsumerStatefulWidget {
 }
 
 class _PaymentTabState extends ConsumerState<PaymentTab> {
-
   int mode = -1;
+
+  bool loading = false;
+
+  void showMessage(String message) => showToast(message, context);
+
+  void goBackHome() => context.router.pop();
+
+  Future<void> makePayment() async {
+    String username = ref.watch(userProvider.select((value) => value.username));
+    String subscriptionPlan = ref
+        .watch(subscriptionPlanProvider.select((value) => value.currentPlan));
+
+    var response = await renewPaymentPlan({
+      "userName": username,
+      "servicePlanId": subscriptionPlan,
+      "paymentMethod": mode == 0 ? "wallet" : "paystack",
+    });
+    setState(() => loading = false);
+    showMessage(response.message);
+    if (response.success) {
+      if (response.data != null) {
+        Future.delayed(Duration.zero, () {
+          launchURL(response.data!.authorizationUrl);
+        });
+      } else {
+        bool initialState = ref.watch(refreshHomeDashboardProvider);
+        ref.watch(refreshHomeDashboardProvider.notifier).state = !initialState;
+        goBackHome();
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,11 +80,13 @@ class _PaymentTabState extends ConsumerState<PaymentTab> {
                     ),
                   ),
                   elevation: mode == 0 ? 1 : 0,
-                  deleteIcon: mode == 0 ? Icon(
-                    Icons.done_rounded,
-                    size: 16.r,
-                    color: mode == 0 ? light : null,
-                  ) : null,
+                  deleteIcon: mode == 0
+                      ? Icon(
+                          Icons.done_rounded,
+                          size: 16.r,
+                          color: mode == 0 ? light : null,
+                        )
+                      : null,
                   onDeleted: mode == 0 ? () {} : null,
                   backgroundColor: mode == 0
                       ? (darkTheme ? secondary : primary)
@@ -75,11 +108,13 @@ class _PaymentTabState extends ConsumerState<PaymentTab> {
                           mode == 1 ? FontWeight.w600 : FontWeight.normal,
                     ),
                   ),
-                  deleteIcon: mode == 1 ? Icon(
-                    Icons.done_rounded,
-                    size: 16.r,
-                    color: mode == 1 ? light : null,
-                  ) : null,
+                  deleteIcon: mode == 1
+                      ? Icon(
+                          Icons.done_rounded,
+                          size: 16.r,
+                          color: mode == 1 ? light : null,
+                        )
+                      : null,
                   onDeleted: mode == 1 ? () {} : null,
                   elevation: mode == 1 ? 1 : 0,
                   backgroundColor: mode == 1
@@ -98,20 +133,28 @@ class _PaymentTabState extends ConsumerState<PaymentTab> {
             style: ElevatedButton.styleFrom(
               minimumSize: Size(390.w, 50.h),
               fixedSize: Size(390.w, 50.h),
-              backgroundColor: darkTheme ? secondary : primary,
+              backgroundColor: darkTheme
+                  ? (mode == -1 ? secondary.withOpacity(0.6) : secondary)
+                  : (mode == -1 ? primary.withOpacity(0.6) : primary),
               elevation: 1.0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(7.5.r),
               ),
             ),
-            onPressed: () {},
-            child: Text(
-              "Pay ₦${formatAmount(currentPlan.amount.toStringAsFixed(0))}",
-              style: context.textTheme.bodyLarge!.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
+            onPressed: () {
+              if (mode == -1 || loading) return;
+              setState(() => loading = true);
+              makePayment();
+            },
+            child: loading
+                ? loader
+                : Text(
+                    "Pay ₦${formatAmount(currentPlan.amount.toStringAsFixed(0))}",
+                    style: context.textTheme.bodyLarge!.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
           ),
         ],
       ),

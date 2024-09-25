@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 void showToast(String message, BuildContext context, {Color? backgroundColor}) {
   HapticFeedback.vibrate();
@@ -221,6 +223,16 @@ List<String> toStringList(List<dynamic> data) {
   }
   return result;
 }
+
+Future<void> launchURL(String url) async {
+  Uri uri = Uri.parse(url);
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(uri);
+  } else {
+    throw 'Could not launch $url';
+  }
+}
+
 
 String roboImage(String id) =>
     "https://gravatar.com/avatar/${fastHash(id).toString()}?s=400&d=robohash&r=x";

@@ -24,6 +24,7 @@ final List<String> paymentModes = ["Wallet", "Paystack"];
 extension StringPath on String {
   String get path => "/$this";
   String get capitalize => "${substring(0, 1).toUpperCase()}${substring(1)}";
+  String get toShortMonth => substring(0, 3);
 }
 
 extension FiberContext on BuildContext {

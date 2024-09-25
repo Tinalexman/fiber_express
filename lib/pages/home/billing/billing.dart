@@ -1,7 +1,6 @@
 import 'package:fiber_express/misc/constants.dart';
 import 'package:fiber_express/pages/home/billing/payment.dart';
 import 'package:fiber_express/pages/home/billing/plan.dart';
-import 'package:fiber_express/pages/home/billing/renewal.dart';
 import 'package:fiber_express/pages/home/billing/wallet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,7 +19,7 @@ class _BillingPageState extends ConsumerState<BillingPage> {
     bool darkTheme = context.isDark;
 
     return DefaultTabController(
-      length: 4,
+      length: 3,
       child: Scaffold(
         appBar: AppBar(
           elevation: 0.0,
@@ -56,7 +55,6 @@ class _BillingPageState extends ConsumerState<BillingPage> {
                     Tab(text: "Payment"),
                     Tab(text: "Change Plan"),
                     Tab(text: "Wallet Top Up"),
-                    Tab(text: "Auto Renewal"),
                   ],
                 ),
                 SizedBox(height: 5.h),
@@ -67,7 +65,6 @@ class _BillingPageState extends ConsumerState<BillingPage> {
                       PaymentTab(),
                       PlanTab(),
                       WalletTab(),
-                      RenewalTab(),
                     ],
                   ),
                 ),

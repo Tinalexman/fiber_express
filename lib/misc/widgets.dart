@@ -1,15 +1,25 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:fiber_express/api/billing.dart';
 import 'package:fiber_express/components/plan.dart';
+import 'package:fiber_express/misc/providers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
+import 'package:intl/intl.dart';
 
 import 'constants.dart';
 import 'functions.dart';
 
 const SpinKitDancingSquare loader = SpinKitDancingSquare(
   color: Colors.white,
+  size: 32,
+);
+
+SpinKitDancingSquare coloredLoader(bool darkTheme) => SpinKitDancingSquare(
+  color: darkTheme ? secondary : primary,
   size: 32,
 );
 
@@ -56,6 +66,29 @@ class CenteredPopup extends StatelessWidget {
   Widget build(BuildContext context) => const Center(child: loader);
 }
 
+class DigitGroupFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text == '') {
+      return newValue;
+    }
+
+    String newText = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+
+    final formatter = NumberFormat('#,###');
+    String formattedText = formatter.format(int.parse(newText));
+
+    int selectionIndex = formattedText.length - (newValue.text.length - newValue.selection.end);
+
+    return TextEditingValue(
+      text: formattedText,
+      selection: TextSelection.collapsed(offset: selectionIndex),
+    );
+  }
+}
+
+
 class SpecialForm extends StatelessWidget {
   final Widget? prefix;
   final Widget? suffix;
@@ -83,6 +116,7 @@ class SpecialForm extends StatelessWidget {
   final bool allowHeightExpand;
   final double width;
   final double height;
+  final List<TextInputFormatter>? formatters;
 
   const SpecialForm({
     super.key,
@@ -105,6 +139,7 @@ class SpecialForm extends StatelessWidget {
     this.action = TextInputAction.none,
     this.onActionPressed,
     this.onChange,
+    this.formatters,
     this.onValidate,
     this.onSave,
     this.radius,
@@ -124,6 +159,7 @@ class SpecialForm extends StatelessWidget {
         autovalidateMode:
             autoValidate ? AutovalidateMode.always : AutovalidateMode.disabled,
         maxLines: maxLines,
+        inputFormatters: formatters,
         focusNode: focus,
         autofocus: autoFocus,
         controller: controller,
@@ -455,61 +491,15 @@ class ChoosePlanContainer extends StatefulWidget {
 class _ChoosePlanContainerState extends State<ChoosePlanContainer> {
   Plan plan = const Plan();
 
-  final List<Plan> allPlans = const [
-    Plan(
-      name: "Royal Plan",
-      downloadRate: 100,
-      amount: 59500,
-    ),
-    Plan(
-      name: "Gold Plan",
-      downloadRate: 40,
-      amount: 28500,
-    ),
-  ];
-
   void showPlans() {
     showModalBottomSheet(
       context: context,
-      builder: (ctx) {
-        bool darkTheme = context.isDark;
-
-        return ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: 50.h,
-            maxHeight: 180.h,
-            minWidth: 375.w,
-            maxWidth: 375.w,
-          ),
-          child: ListView.builder(
-            itemBuilder: (_, index) => ListTile(
-              onTap: () {
-                Navigator.of(ctx).pop();
-                setState(() => plan = allPlans[index]);
-                widget.onSelect(allPlans[index]);
-              },
-              contentPadding: EdgeInsets.symmetric(horizontal: 20.w),
-              leading: Icon(
-                IconsaxPlusLinear.gift,
-                size: 26.r,
-                color: darkTheme ? secondary : primary,
-              ),
-              title: Text(
-                "${allPlans[index].name} (${"₦${formatAmount(allPlans[index].amount.toStringAsFixed(0))}"})",
-                style: context.textTheme.titleMedium!.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              subtitle: Text(
-                "Capped at ${allPlans[index].downloadRate}Mbps",
-                style: context.textTheme.bodyMedium,
-              ),
-            ),
-            itemCount: allPlans.length,
-            physics: const BouncingScrollPhysics(),
-          ),
-        );
-      },
+      builder: (ctx) => _PlansList(
+        onSelectPlan: (selectedPlan) {
+          setState(() => plan = selectedPlan);
+          widget.onSelect(selectedPlan);
+        },
+      ),
       showDragHandle: true,
       elevation: 1.0,
       useSafeArea: true,
@@ -577,6 +567,94 @@ class _ChoosePlanContainerState extends State<ChoosePlanContainer> {
                   ),
                 ],
               ),
+      ),
+    );
+  }
+}
+
+class _PlansList extends ConsumerStatefulWidget {
+  final Function onSelectPlan;
+
+  const _PlansList({
+    super.key,
+    required this.onSelectPlan,
+  });
+
+  @override
+  ConsumerState<_PlansList> createState() => _PlansListState();
+}
+
+class _PlansListState extends ConsumerState<_PlansList> {
+  final List<Plan> allPlans = [];
+  bool loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero, getPlans);
+  }
+
+  void showMessage(String message) => showToast(message, context);
+
+  Future<void> getPlans() async {
+    var response = await getAvailablePlans();
+    Plan currentPlan = ref.watch(currentPlanProvider);
+    loading = false;
+    if (!response.success) {
+      showMessage(response.message);
+    } else {
+      allPlans.clear();
+      allPlans.addAll(response.data.where((element) => element.id != currentPlan.id));
+    }
+
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    bool darkTheme = context.isDark;
+    if (loading) {
+      return SizedBox(
+        width: 375.w,
+        height: 250.h,
+        child: Center(
+          child: coloredLoader(darkTheme),
+        ),
+      );
+    }
+
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        minHeight: 50.h,
+        maxHeight: 250.h,
+        minWidth: 375.w,
+        maxWidth: 375.w,
+      ),
+      child: ListView.builder(
+        itemBuilder: (_, index) => ListTile(
+          onTap: () {
+            widget.onSelectPlan(allPlans[index]);
+            Navigator.of(context).pop();
+          },
+          contentPadding: EdgeInsets.symmetric(horizontal: 20.w),
+          leading: Icon(
+            IconsaxPlusLinear.gift,
+            size: 26.r,
+            color: darkTheme ? secondary : primary,
+          ),
+          title: Text(
+            "${allPlans[index].name} (${"₦${formatAmount(allPlans[index].amount.toStringAsFixed(0))}"})",
+            style: context.textTheme.titleMedium!.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          subtitle: Text(
+            "Capped at ${allPlans[index].downloadRate}Mbps",
+            style: context.textTheme.bodyMedium,
+          ),
+        ),
+        itemCount: allPlans.length,
+        physics: const BouncingScrollPhysics(),
       ),
     );
   }
